@@ -1,0 +1,32 @@
+services:
+  api:
+    container_name: backend-test
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    depends_on:
+      mysql-test:
+        condition: service_healthy
+    ports:
+      - 50010:5000
+    volumes:
+      - .:/app
+  mysql-test:
+    image: mysql:8.0
+    container_name: mysql-test
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: core
+    ports:
+      - 53306:3306
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - test-mysql-data:/var/lib/mysql
+volumes:
+  test-mysql-data:
+  test-mysql-log:
